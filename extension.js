@@ -1,18 +1,32 @@
+
+const Clutter = imports.gi.Clutter;
+const Gio = imports.gi.Gio;
 const Lang = imports.lang;
+const St = imports.gi.St;
 const Main = imports.ui.main;
-const OsdWindow = imports.ui.osdWindow;
+const AppDisplay = imports.ui.appDisplay;
+
+const Overview = imports.ui.overview;
+
+const Signals = imports.signals;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
-//------------------------------------------------
+const Gettext = imports.gettext.domain('set-columns');
+const _ = Gettext.gettext;
+
+//-------------------------------------------------
+
+let _settings;
 
 function init() {
-    Convenience.initTranslations();
+	Convenience.initTranslations();
 }
 
-//------------------------------------------------
+//-------------------------------------------------
+/* do not edit this section */
 
 function injectToFunction(parent, name, func) {
 	let origin = parent[name];
@@ -35,31 +49,53 @@ function removeInjection(object, injection, name) {
 
 let injections=[];
 
-//---------------------------------------------
+//--------------------------------------------------------------
 
-function enable() {
+function reload() {
+	Main.overview.viewSelector.appDisplay._views[1].view._redisplay();
+
+//	let _folderIcons = Main.overview.viewSelector.appDisplay._views[1].view.folderIcons;
+//	_folderIcons.forEach(function(i){
+//		i._redisplay();
+//	});
+}
+
+//-------------------------------------------------
+
+function setNbColumns(setting) {
 	
-	let _settings = Convenience.getSettings('org.gnome.shell.extensions.move-osd-windows');
-	
-	injections['show'] = injectToFunction(OsdWindow.OsdWindow.prototype, 'show',  function(){
-		let monitor = Main.layoutManager.monitors[this._monitorIndex];
-		let h_percent = _settings.get_int('horizontal');
-		let v_percent = _settings.get_int('vertical');
+	if (!injections['_init']) {
+		injections['_init'] = injectToFunction(AppDisplay.BaseAppView.prototype, '_init', function(){
+			this._grid._colLimit = setting;
+		});
+	}
 		
-		this._box.translation_x = h_percent * monitor.width / 100;
-		this._box.translation_y = v_percent * monitor.height / 100;
+	let _views = Main.overview.viewSelector.appDisplay._views;
+	for (let i = 0; i < _views.length; i++) {
+		_views[i].view._grid._colLimit = setting;
+	}
+	
+	let _folderIcons = Main.overview.viewSelector.appDisplay._views[1].view.folderIcons;
+	_folderIcons.forEach(function(i){
+		i.view._grid._colLimit = setting;
+		
 	});
 }
 
-function disable() {
-	
-	let arrayOSD = Main.osdWindowManager._osdWindows
-	
-	for (let i = 0; i < arrayOSD.length; i++) {
-		arrayOSD[i]._relayout();
-		arrayOSD[i]._box.translation_x = 0;
-	}
-	
-	removeInjection(OsdWindow.OsdWindow.prototype, injections, 'show');
+//-------------------------------------------------
+
+function enable() {
+	_settings = Convenience.getSettings('org.gnome.shell.extensions.set-columns');
+	setNbColumns( _settings.get_int('columns-max') );
+	reload();
 }
 
+//-------------------------------------------------
+
+function disable() {
+	setNbColumns( 6 );
+	removeInjection(AppDisplay.BaseAppView.prototype, injections, '_init');
+	reload();
+}
+
+//-------------------------------------------------
