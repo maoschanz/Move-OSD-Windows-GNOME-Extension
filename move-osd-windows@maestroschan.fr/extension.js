@@ -44,9 +44,9 @@ function enable() {
 		'show',
 		function() {
 			if(settings.get_boolean('hide')) {
-				this.actor.visible = false;
+				this.visible = false;
 			} else {
-				this.actor.visible = true;
+				this.visible = true;
 				let monitor = Main.layoutManager.monitors[this._monitorIndex];
 				let h_percent = settings.get_int('horizontal');
 				let v_percent = settings.get_int('vertical');
