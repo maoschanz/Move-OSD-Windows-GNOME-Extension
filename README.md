@@ -19,5 +19,4 @@ Then, enable the extension in the system preferences (gnome tweaks or whatever).
 ## Screenshot
 
 ![Screenshot](http://i.imgur.com/uJPgGkD.png)
-<!--TODO mettre un truc à jour-->
 
