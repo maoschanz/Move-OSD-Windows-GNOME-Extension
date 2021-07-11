@@ -16,7 +16,7 @@ else
 	INSTALL_DIR="$HOME/.local/share/gnome-shell/extensions"
 fi
 
-echo "Installing extension files in $INSTALL_DIR/$EXT_ID.fr"
+echo "Installing extension files in $INSTALL_DIR/$EXT_ID"
 cp -r $EXT_ID $INSTALL_DIR
 
 echo "Done."

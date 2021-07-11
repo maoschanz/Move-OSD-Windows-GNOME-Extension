@@ -15,21 +15,27 @@ const Convenience = Me.imports.convenience;
 const OSDSettingsWidget = new GObject.Class({
 	Name: 'OSD.Prefs.Widget',
 	GTypeName: 'OSDPrefsWidget',
-	Extends: Gtk.Box,
+	Extends: Gtk.Grid,
 
-	_init: function(params) {
-		this.parent(params);
-		this.margin = 30;
-		this.spacing = 25;
-		this.fill = true;
-		this.set_orientation(Gtk.Orientation.VERTICAL);
-
+	_init: function() {
+		this.parent({
+			margin: 25,
+			row_spacing: 30,
+			column_spacing: 20,
+			halign: Gtk.Align.CENTER,
+		});
 		this.SETTINGS = Convenience.getSettings('org.gnome.shell.extensions.move-osd-windows');
 
-		let labelHorizontalPercentage = _("Horizontal position (percentage) :");
+		//----------------------------------------------------------------------
+
+		let horizontalPercentageLabel = new Gtk.Label({
+			label: _("Horizontal position (percentage)"),
+			use_markup: true,
+			halign: Gtk.Align.END
+		});
+		this.attach(horizontalPercentageLabel, 0, 0, 1, 1);
 
 		let horizontalPercentage = new Gtk.SpinButton();
-		horizontalPercentage.set_sensitive(true);
 		horizontalPercentage.set_range(-60, 60);
 		horizontalPercentage.set_value(0);
 		horizontalPercentage.set_value(this.SETTINGS.get_int('horizontal'));
@@ -40,21 +46,18 @@ const OSDSettingsWidget = new GObject.Class({
 			this.SETTINGS.set_int('horizontal', value);
 		}));
 
-		let hBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 15 });
-		hBox.pack_start(new Gtk.Label({
-			label: labelHorizontalPercentage,
-			use_markup: true,
-			halign: Gtk.Align.START
-		}), false, false, 0);
-		hBox.pack_end(horizontalPercentage, false, false, 0);
-		this.add(hBox);
+		this.attach(horizontalPercentage, 1, 0, 1, 1);
 
 		//----------------------------------------------------------------------
 
-		let labelVerticalPercentage = _("Vertical position (percentage) :");
+		let verticalPercentageLabel = new Gtk.Label({
+			label: _("Vertical position (percentage)"),
+			use_markup: true,
+			halign: Gtk.Align.END
+		});
+		this.attach(verticalPercentageLabel, 0, 1, 1, 1);
 
 		let verticalPercentage = new Gtk.SpinButton();
-		verticalPercentage.set_sensitive(true);
 		verticalPercentage.set_range(-110, 110);
 		verticalPercentage.set_value(70);
 		verticalPercentage.set_value(this.SETTINGS.get_int('vertical'));
@@ -65,39 +68,27 @@ const OSDSettingsWidget = new GObject.Class({
 			this.SETTINGS.set_int('vertical', value);
 		}));
 
-		let vBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 15 });
-		vBox.pack_start(new Gtk.Label({
-			label: labelVerticalPercentage,
-			use_markup: true,
-			halign: Gtk.Align.START
-		}), false, false, 0);
-		vBox.pack_end(verticalPercentage, false, false, 0);
-		this.add(vBox);
+		this.attach(verticalPercentage, 1, 1, 1, 1);
 
 		//----------------------------------------------------------------------
 
-		let labelHide = _("Hide totally OSD windows :");
+		let hideSwitchLabel = new Gtk.Label({
+			label: _("Hide totally OSD windows"),
+			use_markup: true,
+			halign: Gtk.Align.END
+		});
+		this.attach(hideSwitchLabel, 0, 2, 1, 1);
 
-		let HideSwitch = new Gtk.Switch();
-		HideSwitch.set_state(false);
-		HideSwitch.set_state(this.SETTINGS.get_boolean('hide'));
+		let hideSwitch = new Gtk.Switch();
+		hideSwitch.set_state(false);
+		hideSwitch.set_halign(Gtk.Align.START)
+		hideSwitch.set_state(this.SETTINGS.get_boolean('hide'));
 
-		HideSwitch.connect('notify::active', Lang.bind(this, function(widget) {
-			if (widget.active) {
-				this.SETTINGS.set_boolean('hide', true);
-			} else {
-				this.SETTINGS.set_boolean('hide', false);
-			}
+		hideSwitch.connect('notify::active', Lang.bind(this, function(widget) {
+			this.SETTINGS.set_boolean('hide', widget.active);
 		}));
 
-		let hideBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 15 });
-		hideBox.pack_start(new Gtk.Label({
-			label: labelHide,
-			use_markup: true,
-			halign: Gtk.Align.START
-		}), false, false, 0);
-		hideBox.pack_end(HideSwitch, false, false, 0);
-		this.add(hideBox);
+		this.attach(hideSwitch, 1, 2, 1, 1);
 	}
 });
 
