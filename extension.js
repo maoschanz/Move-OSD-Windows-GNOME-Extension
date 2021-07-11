@@ -1,32 +1,17 @@
-
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
-const Lang = imports.lang;
-const St = imports.gi.St;
 const Main = imports.ui.main;
-const AppDisplay = imports.ui.appDisplay;
-
-const Overview = imports.ui.overview;
-
-const Signals = imports.signals;
+const OsdWindow = imports.ui.osdWindow;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
-const Gettext = imports.gettext.domain('set-columns');
-const _ = Gettext.gettext;
-
-//-------------------------------------------------
-
-let _settings;
+//------------------------------------------------
 
 function init() {
-	Convenience.initTranslations();
+    Convenience.initTranslations();
 }
 
-//-------------------------------------------------
-/* do not edit this section */
+//------------------------------------------------
 
 function injectToFunction(parent, name, func) {
 	let origin = parent[name];
@@ -49,53 +34,37 @@ function removeInjection(object, injection, name) {
 
 let injections=[];
 
-//--------------------------------------------------------------
+//---------------------------------------------
 
-function reload() {
-	Main.overview.viewSelector.appDisplay._views[1].view._redisplay();
-
-//	let _folderIcons = Main.overview.viewSelector.appDisplay._views[1].view.folderIcons;
-//	_folderIcons.forEach(function(i){
-//		i._redisplay();
-//	});
-}
-
-//-------------------------------------------------
-
-function setNbColumns(setting) {
+function enable() {
 	
-	if (!injections['_init']) {
-		injections['_init'] = injectToFunction(AppDisplay.BaseAppView.prototype, '_init', function(){
-			this._grid._colLimit = setting;
-		});
-	}
-		
-	let _views = Main.overview.viewSelector.appDisplay._views;
-	for (let i = 0; i < _views.length; i++) {
-		_views[i].view._grid._colLimit = setting;
-	}
+	let _settings = Convenience.getSettings('org.gnome.shell.extensions.move-osd-windows');
 	
-	let _folderIcons = Main.overview.viewSelector.appDisplay._views[1].view.folderIcons;
-	_folderIcons.forEach(function(i){
-		i.view._grid._colLimit = setting;
-		
+	injections['show'] = injectToFunction(OsdWindow.OsdWindow.prototype, 'show',  function(){
+	
+		if ( _settings.get_boolean('hide') ){
+			this.actor.visible = false;
+		} else {
+			this.actor.visible = true;
+			let monitor = Main.layoutManager.monitors[this._monitorIndex];
+			let h_percent = _settings.get_int('horizontal');
+			let v_percent = _settings.get_int('vertical');
+			
+			this._box.translation_x = h_percent * monitor.width / 100;
+			this._box.translation_y = v_percent * monitor.height / 100;
+		}
 	});
 }
 
-//-------------------------------------------------
-
-function enable() {
-	_settings = Convenience.getSettings('org.gnome.shell.extensions.set-columns');
-	setNbColumns( _settings.get_int('columns-max') );
-	reload();
-}
-
-//-------------------------------------------------
-
 function disable() {
-	setNbColumns( 6 );
-	removeInjection(AppDisplay.BaseAppView.prototype, injections, '_init');
-	reload();
+	
+	let arrayOSD = Main.osdWindowManager._osdWindows;
+	
+	for (let i = 0; i < arrayOSD.length; i++) {
+		arrayOSD[i]._relayout();
+		arrayOSD[i]._box.translation_x = 0;
+	}
+	
+	removeInjection(OsdWindow.OsdWindow.prototype, injections, 'show');
 }
 
-//-------------------------------------------------
