@@ -1,15 +1,23 @@
 # Move OSD Windows (GNOME Extension)
-A GNOME Shell extension allowing the user to set the position of the OSD windows for sound or luminosity.
+
+A GNOME Shell extension allowing the user to set the position of the OSD windows
+for sound or luminosity.
 
 ## Installation
-The better option is to install it from https://extensions.gnome.org/
 
-> How to manually install the extension ?
+Please install it from <https://extensions.gnome.org/extension/1220/move-osd-windows/>
 
-Download files and put them in an `move-osd-windows@maestroschan.fr` folder to `~/.local/share/gnome-shell/extensions/`
+### Manual installation (discouraged)
 
-You may need to restart the gnome shell environnment ("logout and login again", or alt+f2 + r + enter).
+Download the files and run `./install.sh`
+
+You may need to restart the gnome shell environment ("logout and login again",
+or alt+f2 + r + enter).
+
+Then, enable the extension in the system preferences (gnome tweaks or whatever).
 
 ## Screenshot
 
 ![Screenshot](http://i.imgur.com/uJPgGkD.png)
+<!--TODO mettre un truc à jour-->
+
