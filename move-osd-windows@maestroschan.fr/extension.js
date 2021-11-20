@@ -5,10 +5,9 @@ const OsdWindow = imports.ui.osdWindow;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
 
 function init() {
-	Convenience.initTranslations();
+	ExtensionUtils.initTranslations();
 }
 
 //------------------------------------------------------------------------------
@@ -37,7 +36,7 @@ let injections=[];
 //------------------------------------------------------------------------------
 
 function enable() {
-	let settings = Convenience.getSettings('org.gnome.shell.extensions.move-osd-windows');
+	let settings = ExtensionUtils.getSettings();
 
 	injections['show'] = injectToFunction(
 		OsdWindow.OsdWindow.prototype,

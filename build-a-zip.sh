@@ -14,3 +14,8 @@ zip ../$EXT_ID.zip metadata.json
 zip -r ../$EXT_ID.zip schemas
 zip -r ../$EXT_ID.zip locale
 
+shopt -s globstar
+
+zip -d ../$EXT_ID.zip **/*.pot
+zip -d ../$EXT_ID.zip **/*.po
+

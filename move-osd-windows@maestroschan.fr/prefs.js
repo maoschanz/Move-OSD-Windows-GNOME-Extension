@@ -8,7 +8,6 @@ const _ = Gettext.gettext;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
 
 //------------------------------------------------------------------------------
 
@@ -24,7 +23,7 @@ const OSDSettingsWidget = new GObject.Class({
 			column_spacing: 20,
 			halign: Gtk.Align.CENTER,
 		});
-		this.SETTINGS = Convenience.getSettings('org.gnome.shell.extensions.move-osd-windows');
+		this.SETTINGS = ExtensionUtils.getSettings();
 
 		//----------------------------------------------------------------------
 
@@ -95,7 +94,7 @@ const OSDSettingsWidget = new GObject.Class({
 //------------------------------------------------------------------------------
 
 function init() {
-	Convenience.initTranslations();
+	ExtensionUtils.initTranslations();
 }
 
 // This is like the "enable" in extension.js : something called each time the
